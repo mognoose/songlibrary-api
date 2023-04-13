@@ -43,7 +43,8 @@ const getListFiles = (req, res) => {
     files.forEach((file) => {
       fileInfos.push({
         name: file,
-        url: process.env.BASE_URL + file,
+        stream: process.env.BASE_URL + '/files/stream/' + file,
+        download: process.env.BASE_URL + '/files/download/' + file,
       });
     });
 
