@@ -1,28 +1,31 @@
 const uploadFile = require("../middleware/upload");
+const auth = require("../middleware/auth");
 const fs = require('fs');
 require('dotenv').config();
 
 const upload = async (req, res) => {
-  try {
-    await uploadFile(req, res);
+    if(!auth(req)) return res.status(401).send({message: "Unauthorized"});
 
-    if (req.file == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
-    }
+    try {
+        await uploadFile(req, res);
 
-    res.status(200).send({
-      message: "Uploaded the file successfully: " + req.file.originalname,
-    });
-  } catch (err) {
-    if (err.code == "LIMIT_FILE_SIZE") {
-        return res.status(500).send({
-            message: "File size cannot be larger than 200MB!",
+        if (req.file == undefined) {
+        return res.status(400).send({ message: "Please upload a file!" });
+        }
+
+        res.status(200).send({
+        message: "Uploaded the file successfully: " + req.file.originalname,
+        });
+    } catch (err) {
+        if (err.code == "LIMIT_FILE_SIZE") {
+            return res.status(500).send({
+                message: "File size cannot be larger than 200MB!",
+            });
+        }
+        res.status(500).send({
+        message: `Could not upload the file: ${req.file.originalname}. ${err}`,
         });
     }
-    res.status(500).send({
-      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
-    });
-  }
 };
 
 const getListFiles = (req, res) => {
